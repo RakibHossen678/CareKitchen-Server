@@ -1,4 +1,4 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -40,6 +40,10 @@ async function run() {
       res.send(result);
     });
     //get food data from database
+    app.get('/food',async(req,res)=>{
+      const result=await foodsCollection.find().toArray()
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     console.log(
