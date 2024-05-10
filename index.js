@@ -55,25 +55,34 @@ async function run() {
     });
     app.put("/food/:id", async (req, res) => {
       const id = req.params.id;
-      const foodData=req.body
-      console.log(foodData)
+      const foodData = req.body;
+      console.log(foodData);
       const query = { _id: new ObjectId(id) };
-      const options = { upsert: true }
+      const options = { upsert: true };
       const updateDoc = {
         $set: {
           ...foodData,
         },
-      }
-      const result = await foodsCollection.updateOne(query, updateDoc, options)
+      };
+      const result = await foodsCollection.updateOne(query, updateDoc, options);
       res.send(result);
     });
-    app.get('/availableFood',async(req,res)=>{
-      const sort=req.query.sort
+    app.get("/availableFood", async (req, res) => {
+      const sort = req.query.sort;
+      const search = req.query.search;
+      const query = {};
+      if (search) {
+        query.foodName = { $regex: search, $options: "i" };
+      }
+
       // console.log(sort)
       // return
-      const result=await foodsCollection.find().sort({ expiredDate: sort === 'dsc' ? 1 : -1 }).toArray()
-      res.send(result)
-    })
+      const result = await foodsCollection
+        .find(query)
+        .sort({ expiredDate: sort === "dsc" ? 1 : -1 })
+        .toArray();
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     console.log(
