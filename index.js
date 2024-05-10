@@ -53,6 +53,20 @@ async function run() {
       const result = await foodsCollection.findOne(query);
       res.send(result);
     });
+    app.put("/food/:id", async (req, res) => {
+      const id = req.params.id;
+      const foodData=req.body
+      console.log(foodData)
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true }
+      const updateDoc = {
+        $set: {
+          ...foodData,
+        },
+      }
+      const result = await foodsCollection.updateOne(query, updateDoc, options)
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     console.log(
