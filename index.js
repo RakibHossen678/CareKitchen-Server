@@ -35,15 +35,24 @@ async function run() {
     //add food to database
     app.post("/addFood", async (req, res) => {
       const foodData = req.body;
-      console.log(foodData)
+      console.log(foodData);
       const result = await foodsCollection.insertOne(foodData);
       res.send(result);
     });
     //get food data from database
-    app.get('/food',async(req,res)=>{
-      const result=await foodsCollection.find().toArray()
-      res.send(result)
-    })
+    app.get("/food", async (req, res) => {
+      const result = await foodsCollection
+        .find()
+        .sort({ foodQuantity: -1 })
+        .toArray();
+      res.send(result);
+    });
+    app.get("/food/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await foodsCollection.findOne(query);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     console.log(
