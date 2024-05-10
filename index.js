@@ -67,6 +67,13 @@ async function run() {
       const result = await foodsCollection.updateOne(query, updateDoc, options)
       res.send(result);
     });
+    app.get('/availableFood',async(req,res)=>{
+      const sort=req.query.sort
+      // console.log(sort)
+      // return
+      const result=await foodsCollection.find().sort({ expiredDate: sort === 'dsc' ? 1 : -1 }).toArray()
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     console.log(
