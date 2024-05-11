@@ -74,13 +74,23 @@ async function run() {
       if (search) {
         query.foodName = { $regex: search, $options: "i" };
       }
-
-      // console.log(sort)
-      // return
       const result = await foodsCollection
         .find(query)
         .sort({ expiredDate: sort === "dsc" ? 1 : -1 })
         .toArray();
+      res.send(result);
+    });
+
+    app.get('/myFood/:email',async(req,res)=>{
+      const email=req.params.email
+      const query={'donor.email':email}
+      const result=await foodsCollection.find(query).toArray()
+      res.send(result)
+    })
+    app.delete("/myFood/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await foodsCollection.deleteOne(query);
       res.send(result);
     });
 
