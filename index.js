@@ -118,6 +118,12 @@ async function run() {
       const result=await foodsCollection.updateOne(query,updateDoc)
       res.send(result)
     });
+    app.get('/request/:email',async(req,res)=>{
+      const email=req.params.email
+      const query={userEmail:email}
+      const result=await foodsCollection.find(query).toArray()
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     console.log(
