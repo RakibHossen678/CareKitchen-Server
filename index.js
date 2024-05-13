@@ -1,5 +1,7 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
@@ -14,6 +16,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.vrdje6l.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -31,6 +34,22 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
 
     const foodsCollection = client.db("careKitchen").collection("foods");
+
+    //jwt
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "365d",
+      });
+      res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        })
+        .send({ success: true });
+    });
 
     //add food to database
     app.post("/addFood", async (req, res) => {
@@ -104,26 +123,26 @@ async function run() {
       const foodData = req.body;
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      
-      const updateDoc={
+
+      const updateDoc = {
         $set: {
-          foodName:foodData.foodName,
-          foodImg:foodData.foodImg,
-          foodQuantity:foodData.foodQuantity,
-          pickupLocation:foodData.pickupLocation,
-          expiredDate:foodData.expiredDate,
-          notes:foodData.notes
+          foodName: foodData.foodName,
+          foodImg: foodData.foodImg,
+          foodQuantity: foodData.foodQuantity,
+          pickupLocation: foodData.pickupLocation,
+          expiredDate: foodData.expiredDate,
+          notes: foodData.notes,
         },
       };
-      const result=await foodsCollection.updateOne(query,updateDoc)
-      res.send(result)
+      const result = await foodsCollection.updateOne(query, updateDoc);
+      res.send(result);
     });
-    app.get('/request/:email',async(req,res)=>{
-      const email=req.params.email
-      const query={userEmail:email}
-      const result=await foodsCollection.find(query).toArray()
-      res.send(result)
-    })
+    app.get("/request/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { userEmail: email };
+      const result = await foodsCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     console.log(
