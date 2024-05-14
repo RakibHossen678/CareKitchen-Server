@@ -9,7 +9,12 @@ const port = process.env.port || 5000;
 
 //Middlewares
 const corsOptions = {
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://assignment11-736a2.web.app",
+    "https://assignment11-736a2.firebaseapp.com",
+  ],
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -171,7 +176,7 @@ async function run() {
       const result = await foodsCollection.updateOne(query, updateDoc);
       res.send(result);
     });
-    app.get("/request/:email",verifyToken,  async (req, res) => {
+    app.get("/request/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
       tokenEmail = req.user.email;
       if (tokenEmail !== email) {
